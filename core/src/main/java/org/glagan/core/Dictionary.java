@@ -34,4 +34,14 @@ public enum Dictionary {
     public int getValue() {
         return value;
     }
+
+    static public Dictionary fromString(String key) {
+        int keyValue = Integer.parseInt(key);
+        for (Dictionary dictionary : Dictionary.values()) {
+            if (dictionary.getValue() == keyValue) {
+                return dictionary;
+            }
+        }
+        return null;
+    }
 }

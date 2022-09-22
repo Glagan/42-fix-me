@@ -19,4 +19,13 @@ public enum MsgType {
     public String getValue() {
         return value;
     }
+
+    static public MsgType fromString(String value) {
+        for (MsgType msgType : MsgType.values()) {
+            if (msgType.getValue().equals(value)) {
+                return msgType;
+            }
+        }
+        return null;
+    }
 }
