@@ -8,7 +8,7 @@ import org.glagan.core.Handler.Handler;
 import org.glagan.router.Handler.Authentication;
 import org.glagan.router.Handler.ForwardToBroker;
 
-public class Client extends org.glagan.router.Client {
+public class Client extends org.glagan.router.Connection {
     protected Handler handler;
 
     public Client(Socket socket) {

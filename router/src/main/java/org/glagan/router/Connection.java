@@ -9,11 +9,11 @@ import org.glagan.core.Message;
 import org.glagan.core.MessageInputReader;
 import org.glagan.core.MsgType;
 
-public abstract class Client implements Runnable {
+public abstract class Connection implements Runnable {
     protected Socket socket;
     protected String id;
 
-    public Client(Socket socket) {
+    public Connection(Socket socket) {
         this.socket = socket;
         this.id = UUID.randomUUID().toString();
         if (!socket.isClosed()) {

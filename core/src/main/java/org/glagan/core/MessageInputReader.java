@@ -32,6 +32,10 @@ public class MessageInputReader {
         return -1;
     }
 
+    /**
+     * Read the input stream until a CheckSum(10) pattern is found and return the
+     * packet
+     */
     public String read() {
         int checkSumPatternEnd = -1;
         if ((checkSumPatternEnd = hasCheckSumPattern()) > -1) {
