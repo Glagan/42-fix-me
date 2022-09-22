@@ -20,7 +20,6 @@ public class Client extends org.glagan.router.Client {
 
     public void onMessage(Message message) {
         if (message != null) {
-            System.out.println("Received message: " + message.pretty());
             handler.handle(id, message);
         }
     }

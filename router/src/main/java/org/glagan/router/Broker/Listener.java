@@ -14,6 +14,7 @@ public class Listener extends org.glagan.router.Listener {
 
     public void onConnection(Socket socket) {
         Client client = new Client(socket);
+        System.out.println("[" + client.getId() + "] Connected new Broker");
         Router.getInstance().addBroker(client);
         new Thread(client).start();
     }

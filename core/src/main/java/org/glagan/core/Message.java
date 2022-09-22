@@ -201,7 +201,7 @@ public class Message {
             System.out.println("BodyLength(9) is required");
             return null;
         }
-        if (header.getBodyLength() <= 0) {
+        if (header.getBodyLength() < 0) {
             System.out.println("BodyLength(9) should be greater or equal to 0");
             return null;
         }
@@ -214,7 +214,7 @@ public class Message {
             return null;
         }
         if (header.getMsgSeqNum() <= 0) {
-            System.out.println("MsgSeqNum(34) should be greater or equal to 0");
+            System.out.println("MsgSeqNum(34) should be greater than 0");
             return null;
         }
         if (header.getSendTime() == null) {

@@ -11,8 +11,12 @@ public class ForwardToMarket extends Handler {
 
         String expectedFor = message.getBody().get(Dictionary.Market);
         if (expectedFor != null) {
-            Router.getInstance().forward(expectedFor, message);
-            return handleNext(clientId, message);
+            if (Router.getInstance().forward(expectedFor, message)) {
+                System.out.println("[" + clientId + "] Forwaded message to " + expectedFor);
+                return handleNext(clientId, message);
+            } else {
+                System.out.println("[" + clientId + "] Can't forward message to inexisting market " + expectedFor);
+            }
         }
 
         return false;

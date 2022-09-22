@@ -7,11 +7,12 @@ public class Authentication extends Handler {
     public boolean handle(String clientId, Message message) {
         System.out.println("[Handler/Authentication]");
 
-        if (clientId == message.getHeader().getBeginString()) {
+        if (clientId.equals(message.getHeader().getBeginString())) {
             return handleNext(clientId, message);
         }
 
-        System.out.println("Unauthorized message with BeginString(8)=" + message.getHeader().getBeginString());
+        System.out.println("Unauthorized message with BeginString(8)=" + message.getHeader().getBeginString()
+                + " (expected " + clientId + ")");
         return false;
     }
 }

@@ -19,7 +19,7 @@ public abstract class Client implements Runnable {
         this.socket = socket;
         this.id = UUID.randomUUID().toString();
         if (!socket.isClosed()) {
-            send(Message.make(MsgType.Logon).auth(this.id).build());
+            send(Message.make(MsgType.Logon).auth(this.id).continueFrom(1).build());
         }
     }
 
@@ -42,8 +42,10 @@ public abstract class Client implements Runnable {
             do {
                 text = reader.readLine();
                 if (text != null) {
-                    System.out.println("received text: " + text);
                     Message message = Message.fromString(text);
+                    if (message != null) {
+                        System.out.println("[" + id + "] " + message.pretty());
+                    }
                     onMessage(message);
                 }
             } while (text != null);
@@ -61,9 +63,9 @@ public abstract class Client implements Runnable {
         OutputStream output;
         try {
             output = socket.getOutputStream();
-            output.write(message.toFix().getBytes());
+            output.write((message.toFix() + "\n").getBytes());
         } catch (IOException e) {
-            System.err.println("Failed to read socket output stream:");
+            System.err.println("Failed to write to socket output stream:");
             e.printStackTrace();
         }
     }
