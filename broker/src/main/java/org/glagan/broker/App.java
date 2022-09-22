@@ -1,55 +1,55 @@
 package org.glagan.broker;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 
-import org.glagan.core.Dictionary;
-import org.glagan.core.Message;
-import org.glagan.core.MessageInputReader;
-import org.glagan.core.MsgType;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class App {
     public static void main(String[] args) {
+        Options options = new Options();
+
+        Option hostOption = new Option("h", "host", true, "hostname of the router");
+        hostOption.setRequired(false);
+        options.addOption(hostOption);
+
+        Option portOption = new Option("p", "port", true, "port of the router");
+        portOption.setType(Number.class);
+        portOption.setRequired(false);
+        options.addOption(portOption);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd = null;
+
         String host = "localhost";
         int port = 5000;
-        try (Socket socket = new Socket(host, port)) {
-            System.out.println("Connected to " + host + ":" + port);
-            MessageInputReader reader = new MessageInputReader(socket.getInputStream());
-
-            String id = null;
-            while (true) {
-                String packet = reader.read();
-                if (packet != null) {
-                    Message message = Message.fromString(packet);
-                    if (message != null) {
-                        if (message.getHeader().getMsgType().equals(MsgType.Logon)) {
-                            System.out.println("received id " + message.getHeader().getBeginString());
-                            id = message.getHeader().getBeginString();
-
-                            OutputStream output;
-                            try {
-                                output = socket.getOutputStream();
-                                Message sendingMessage = Message.make(MsgType.Buy)
-                                        .auth(id).continueFrom(1)
-                                        .add(Dictionary.OrderId, "1")
-                                        .add(Dictionary.Market, "36641908-4928-4df5-8e24-0ce0e4aa47b9")
-                                        .add(Dictionary.Instrument, "chair")
-                                        .add(Dictionary.Quantity, "42")
-                                        .add(Dictionary.Price, "42.42")
-                                        .build();
-                                System.out.println("Sending message " + sendingMessage.toFix());
-                                output.write((sendingMessage.toFix()).getBytes());
-                            } catch (IOException e) {
-                                System.err.println("Failed to read socket output stream:");
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                } else {
-                    break;
+        try {
+            cmd = parser.parse(options, args);
+            host = cmd.getOptionValue("host", "localhost");
+            if (cmd.hasOption("port")) {
+                port = ((Number) cmd.getParsedOptionValue("port")).intValue();
+                if (port < 0 || port > 65535) {
+                    System.out.println("Invalid port " + port);
+                    System.exit(1);
                 }
             }
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("broker", options);
+            System.exit(1);
+        }
+
+        try (Socket socket = new Socket(host, port)) {
+            System.out.println("Connected to " + host + ":" + port);
+            BrokerClient client = new BrokerClient(socket);
+            client.run(); // The client is a Runnable that run in the main thread
         } catch (IOException e) {
             e.printStackTrace();
         }

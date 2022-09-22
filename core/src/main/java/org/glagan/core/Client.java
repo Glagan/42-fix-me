@@ -1,24 +1,16 @@
-package org.glagan.router;
+package org.glagan.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.UUID;
 
-import org.glagan.core.Message;
-import org.glagan.core.MessageInputReader;
-import org.glagan.core.MsgType;
-
-public abstract class Connection implements Runnable {
+public class Client implements Runnable {
     protected Socket socket;
     protected String id;
 
-    public Connection(Socket socket) {
+    public Client(Socket socket) {
         this.socket = socket;
-        this.id = UUID.randomUUID().toString();
-        if (!socket.isClosed()) {
-            send(Message.make(MsgType.Logon).auth(this.id).continueFrom(1).build());
-        }
+        this.id = null;
     }
 
     public Socket getSocket() {
@@ -29,31 +21,45 @@ public abstract class Connection implements Runnable {
         return id;
     }
 
-    public abstract void onMessage(Message message);
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void onMessage(Message message) {
+    }
+
+    public void onClose() {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            System.out.println("Server exception: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
 
     public void run() {
         try {
             MessageInputReader reader = new MessageInputReader(socket.getInputStream());
-
             while (true) {
                 String packet = reader.read();
                 if (packet != null) {
                     Message message = Message.fromString(packet);
                     if (message != null) {
-                        System.out.println("[" + id + "] " + message.pretty());
+                        if (id != null) {
+                            System.out.print("[" + id + "] ");
+                        }
+                        System.out.println(message.pretty());
                     }
                     onMessage(message);
                 } else {
                     break;
                 }
             }
-
-            System.out.println("Closing client port " + socket.getPort());
-            Router.getInstance().removeClient(this);
-            socket.close();
-        } catch (IOException ex) {
-            System.out.println("Server exception: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("Closing port " + socket.getPort());
+            onClose();
         }
     }
 

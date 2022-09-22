@@ -5,10 +5,11 @@ import java.net.Socket;
 import org.glagan.core.Message;
 import org.glagan.core.Handler.BaseHandler;
 import org.glagan.core.Handler.Handler;
+import org.glagan.router.RouterClient;
 import org.glagan.router.Handler.Authentication;
 import org.glagan.router.Handler.ForwardToBroker;
 
-public class Client extends org.glagan.router.Connection {
+public class Client extends RouterClient {
     protected Handler handler;
 
     public Client(Socket socket) {
@@ -20,7 +21,6 @@ public class Client extends org.glagan.router.Connection {
 
     public void onMessage(Message message) {
         if (message != null) {
-            System.out.println("Received message: " + message.pretty());
             handler.handle(id, message);
         }
     }

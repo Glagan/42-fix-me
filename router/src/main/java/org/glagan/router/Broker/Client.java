@@ -5,10 +5,11 @@ import java.net.Socket;
 import org.glagan.core.Message;
 import org.glagan.core.Handler.BaseHandler;
 import org.glagan.core.Handler.Handler;
+import org.glagan.router.RouterClient;
 import org.glagan.router.Handler.Authentication;
 import org.glagan.router.Handler.ForwardToMarket;
 
-public class Client extends org.glagan.router.Connection {
+public class Client extends RouterClient {
     protected Handler handler;
 
     public Client(Socket socket) {
