@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.UUID;
 
 import org.glagan.core.Message;
+import org.glagan.core.MsgType;
 import org.glagan.core.Handler.Handler;
 
 public class Client implements Runnable {
@@ -20,6 +21,21 @@ public class Client implements Runnable {
         this.socket = socket;
         this.id = UUID.randomUUID().toString();
         this.handler = handler;
+        if (!socket.isClosed()) {
+            send(Message.make(MsgType.Logon).auth(this.id).build());
+        }
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Handler getHandler() {
+        return handler;
     }
 
     public void run() {
@@ -31,7 +47,7 @@ public class Client implements Runnable {
             do {
                 text = reader.readLine();
                 if (text != null) {
-                    Message message = Message.fromBuffer(text);
+                    Message message = Message.fromString(text);
                     if (message != null) {
                         System.out.println("Received message: " + message.pretty());
                         handler.handle(message);
@@ -49,8 +65,10 @@ public class Client implements Runnable {
         }
     }
 
-    public void send(Message message) {
-        try (OutputStream output = socket.getOutputStream()) {
+    public synchronized void send(Message message) {
+        OutputStream output;
+        try {
+            output = socket.getOutputStream();
             output.write(message.toFix().getBytes());
         } catch (IOException e) {
             System.err.println("Failed to read socket output stream:");

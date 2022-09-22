@@ -12,6 +12,7 @@ public enum Dictionary {
     Instrument("Instrument", 42),
     Quantity("Quantity", 53),
     Market("Market", 64),
+    Broker("Market", 74),
     Price("Price", 65),
     TestReqId("TestReqId", 112),
     RefSeqNum("RefSeqNum", 45),

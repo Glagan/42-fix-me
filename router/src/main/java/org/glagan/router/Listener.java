@@ -19,6 +19,18 @@ public class Listener implements Runnable {
         this.clients = new ArrayList<Client>();
     }
 
+    public int getPort() {
+        return port;
+    }
+
+    public Handler getChain() {
+        return chain;
+    }
+
+    public List<Client> getClients() {
+        return clients;
+    }
+
     public void run() {
         try (ServerSocket server = new ServerSocket(port)) {
             System.out.println("Listening on port " + port);
@@ -27,12 +39,13 @@ public class Listener implements Runnable {
                 System.out.println("Accepted new client on port " + socket.getPort());
                 Client client = new Client(socket, chain.clone());
                 clients.add(client);
+                // TODO on thread death remove it from the clients
                 new Thread(client).start();
             }
         } catch (IOException e) {
             System.err.println("Failed to open socket server:");
             e.printStackTrace();
         }
-
     }
+
 }

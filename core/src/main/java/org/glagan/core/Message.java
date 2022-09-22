@@ -68,12 +68,12 @@ public class Message {
     }
 
     public boolean isCorrupted() {
-        if (header == null || body == null || trailer == null) {
+        if (header == null || trailer == null) {
             return true;
         }
 
         // Check that header.bodyLength is valid
-        if (header.getBodyLength() != body.size()) {
+        if (header.getBodyLength() > 0 && (body == null || header.getBodyLength() != body.size())) {
             return true;
         }
 
@@ -85,7 +85,7 @@ public class Message {
         return false;
     }
 
-    public static Message fromBuffer(String buffer) {
+    public static Message fromString(String buffer) {
         if (buffer == null) {
             return null;
         }
@@ -102,9 +102,19 @@ public class Message {
         Map<Dictionary, String> body = new HashMap<>();
         int checksum = 0;
 
-        for (String part : parts) {
+        boolean foundBodyLength = false;
+        boolean foundMsgSeqNum = false;
+        boolean foundCheckSum = false;
+
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
             if (part.equals("")) {
-                continue;
+                if (i == parts.length - 1) {
+                    break;
+                } else {
+                    System.out.println("Invalid empty Tag");
+                    return null;
+                }
             }
             String[] pair = part.split("=");
             if (pair.length != 2 || pair[0] == null || pair[1] == null) {
@@ -119,29 +129,61 @@ public class Message {
                 System.out.println("Duplicate key " + key.getName());
                 return null;
             }
-            // TODO check fields order
+
             switch (key) {
                 case BeginString:
+                    if (i != 0) {
+                        System.out.println("BeginString(8) should be on the first position");
+                        return null;
+                    }
                     header.setBeginString(pair[1]);
                     break;
                 case BodyLength:
+                    if (i != 1) {
+                        System.out.println("BodyLength(9) should be on the second position");
+                        return null;
+                    }
+                    foundBodyLength = true;
                     header.setBodyLength(Integer.parseInt(pair[1]));
                     break;
                 case MsgType:
-                    header.setMsgType(MsgType.fromString(pair[1]));
+                    if (i != 2) {
+                        System.out.println("MsgType(35) should be on the third position");
+                        return null;
+                    }
+                    MsgType msgType = MsgType.fromString(pair[1]);
+                    if (msgType == null) {
+                        System.out.println("Invalid MsgType(35) " + pair[1]);
+                        return null;
+                    }
+                    header.setMsgType(msgType);
                     break;
                 case MsgSeqNum:
+                    if (i != 3) {
+                        System.out.println("MsgSeqNum(34) should be on the fourth position");
+                        return null;
+                    }
+                    foundMsgSeqNum = true;
                     header.setMsgSeqNum(Integer.parseInt(pair[1]));
                     break;
                 case SendingTime:
+                    if (i != 4) {
+                        System.out.println("SendingTime(52) should be on the fifth position");
+                        return null;
+                    }
                     try {
                         header.setSendTime(dateFormat.parse(pair[1]));
                     } catch (ParseException e) {
-                        System.out.println("Invalid SendingTime " + pair[1]);
+                        System.out.println("Invalid SendingTime(52) " + pair[1]);
                         return null;
                     }
                     break;
                 case CheckSum:
+                    if (i != parts.length - 1) {
+                        System.out.println("CheckSum(10) should be on the last position");
+                        return null;
+                    }
+                    foundCheckSum = true;
                     checksum = Integer.parseInt(pair[1]);
                     break;
                 default:
@@ -149,6 +191,43 @@ public class Message {
                     break;
             }
             seenTags.add(key);
+        }
+
+        if (header.getBeginString() == null) {
+            System.out.println("BeginString(8) is required");
+            return null;
+        }
+        if (!foundBodyLength) {
+            System.out.println("BodyLength(9) is required");
+            return null;
+        }
+        if (header.getBodyLength() <= 0) {
+            System.out.println("BodyLength(9) should be greater or equal to 0");
+            return null;
+        }
+        if (header.getMsgType() == null) {
+            System.out.println("MsgType(35) is required");
+            return null;
+        }
+        if (!foundMsgSeqNum) {
+            System.out.println("MsgSeqNum(34) is required");
+            return null;
+        }
+        if (header.getMsgSeqNum() <= 0) {
+            System.out.println("MsgSeqNum(34) should be greater or equal to 0");
+            return null;
+        }
+        if (header.getSendTime() == null) {
+            System.out.println("SendingTime(52) is required");
+            return null;
+        }
+        if (!foundCheckSum) {
+            System.out.println("CheckSum(10) is required");
+            return null;
+        }
+        if (checksum < 0 || checksum > 255) {
+            System.out.println("CheckSum(10) should be between 0 and 255");
+            return null;
         }
 
         Message message = new Message(header, body);
@@ -160,39 +239,67 @@ public class Message {
         return new MessageBuilder().type(type);
     }
 
-    public String print(String separator) {
-        if (header == null || body == null || trailer == null) {
+    public String pretty() {
+        if (header == null || trailer == null) {
             return null;
         }
 
-        String result = Dictionary.BeginString.getValue() + "=" + header.getBeginString() + separator;
-        result += Dictionary.BodyLength.getValue() + "=" + header.getBodyLength() + separator;
-        result += Dictionary.MsgType.getValue() + "=" + header.getMsgType().getValue() + separator;
+        String result = Dictionary.BeginString.getName() + "(" + Dictionary.BeginString.getValue() + ")="
+                + header.getBeginString() + '|';
+        result += Dictionary.BodyLength.getName() + "(" + Dictionary.BodyLength.getValue() + ")="
+                + header.getBodyLength() + '|';
+        result += Dictionary.MsgType.getName() + "(" + Dictionary.MsgType.getValue() + ")="
+                + header.getMsgType().getValue() + '|';
         if (header.getMsgSeqNum() > 0) {
-            result += Dictionary.MsgSeqNum.getValue() + "=" + header.getMsgSeqNum() + separator;
+            result += Dictionary.MsgSeqNum.getName() + "(" + Dictionary.MsgSeqNum.getValue() + ")="
+                    + header.getMsgSeqNum() + '|';
         }
         if (header.getSendTime() != null) {
             DateFormat formatter = new SimpleDateFormat("YYYYMMDD-HH:mm:ss");
             String utcTimestamp = formatter.format(header.getSendTime());
-            result += Dictionary.SendingTime.getValue() + "=" + utcTimestamp + separator;
+            result += Dictionary.SendingTime.getName() + "(" + Dictionary.SendingTime.getValue() + ")=" + utcTimestamp
+                    + '|';
         }
 
-        for (Map.Entry<Dictionary, String> entry : body.entrySet()) {
-            result += entry.getKey().getValue() + "=" + entry.getValue() + separator;
+        if (body != null) {
+            for (Map.Entry<Dictionary, String> entry : body.entrySet()) {
+                result += entry.getKey().getName() + "(" + entry.getKey().getValue() + ")=" + entry.getValue() + '|';
+            }
         }
 
         String paddedChecksum = String.format("%03d", trailer.getChecksum());
-        result += Dictionary.CheckSum.getValue() + "=" + paddedChecksum + separator;
+        result += Dictionary.CheckSum.getName() + "(" + Dictionary.CheckSum.getValue() + ")=" + paddedChecksum + '|';
 
         return result;
     }
 
-    public String pretty() {
-        return print("|");
-    }
-
     public String toFix() {
-        return print("" + (char) 0x1);
+        if (header == null || trailer == null) {
+            return null;
+        }
+
+        String result = Dictionary.BeginString.getValue() + "=" + header.getBeginString() + (char) 0x1;
+        result += Dictionary.BodyLength.getValue() + "=" + header.getBodyLength() + (char) 0x1;
+        result += Dictionary.MsgType.getValue() + "=" + header.getMsgType().getValue() + (char) 0x1;
+        if (header.getMsgSeqNum() > 0) {
+            result += Dictionary.MsgSeqNum.getValue() + "=" + header.getMsgSeqNum() + (char) 0x1;
+        }
+        if (header.getSendTime() != null) {
+            DateFormat formatter = new SimpleDateFormat("YYYYMMDD-HH:mm:ss");
+            String utcTimestamp = formatter.format(header.getSendTime());
+            result += Dictionary.SendingTime.getValue() + "=" + utcTimestamp + (char) 0x1;
+        }
+
+        if (body != null) {
+            for (Map.Entry<Dictionary, String> entry : body.entrySet()) {
+                result += entry.getKey().getValue() + "=" + entry.getValue() + (char) 0x1;
+            }
+        }
+
+        String paddedChecksum = String.format("%03d", trailer.getChecksum());
+        result += Dictionary.CheckSum.getValue() + "=" + paddedChecksum + (char) 0x1;
+
+        return result;
     }
 
     public static DateFormat getDateFormat() {

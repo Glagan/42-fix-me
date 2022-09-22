@@ -8,7 +8,8 @@ public enum MsgType {
     Buy("D"),
     Sell("SE"),
     Executed("EX"),
-    Rejected("RJ");
+    Rejected("RJ"),
+    Logon("A");
 
     private String value;
 

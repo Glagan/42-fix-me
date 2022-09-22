@@ -24,7 +24,7 @@ public abstract class Handler {
         return next;
     }
 
-    final public Handler clone() {
+    public Handler clone() {
         Handler handler = null;
         try {
             handler = getClass().getConstructor().newInstance();
