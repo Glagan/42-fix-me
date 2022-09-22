@@ -10,17 +10,14 @@ import java.util.UUID;
 
 import org.glagan.core.Message;
 import org.glagan.core.MsgType;
-import org.glagan.core.Handler.Handler;
 
-public class Client implements Runnable {
+public abstract class Client implements Runnable {
     protected Socket socket;
     protected String id;
-    protected Handler handler;
 
-    public Client(Socket socket, Handler handler) {
+    public Client(Socket socket) {
         this.socket = socket;
         this.id = UUID.randomUUID().toString();
-        this.handler = handler;
         if (!socket.isClosed()) {
             send(Message.make(MsgType.Logon).auth(this.id).build());
         }
@@ -34,9 +31,7 @@ public class Client implements Runnable {
         return id;
     }
 
-    public Handler getHandler() {
-        return handler;
-    }
+    public abstract void onMessage(Message message);
 
     public void run() {
         try {
@@ -47,17 +42,14 @@ public class Client implements Runnable {
             do {
                 text = reader.readLine();
                 if (text != null) {
+                    System.out.println("received text: " + text);
                     Message message = Message.fromString(text);
-                    if (message != null) {
-                        System.out.println("Received message: " + message.pretty());
-                        handler.handle(message);
-                    } else {
-                        System.out.println("Received invalid message: " + text);
-                    }
+                    onMessage(message);
                 }
             } while (text != null);
 
             System.out.println("Closing client port " + socket.getPort());
+            Router.getInstance().removeClient(this);
             socket.close();
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());

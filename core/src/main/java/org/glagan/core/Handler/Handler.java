@@ -1,7 +1,5 @@
 package org.glagan.core.Handler;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.glagan.core.Message;
 
 /**
@@ -10,11 +8,11 @@ import org.glagan.core.Message;
 public abstract class Handler {
     protected Handler next;
 
-    abstract public boolean handle(Message message);
+    abstract public boolean handle(String clientId, Message message);
 
-    final public boolean handleNext(Message message) {
+    final public boolean handleNext(String clientId, Message message) {
         if (next != null) {
-            return next.handle(message);
+            return next.handle(clientId, message);
         }
         return true;
     }
@@ -22,20 +20,5 @@ public abstract class Handler {
     final public Handler setNext(Handler next) {
         this.next = next;
         return next;
-    }
-
-    public Handler clone() {
-        Handler handler = null;
-        try {
-            handler = getClass().getConstructor().newInstance();
-            if (next != null) {
-                handler.setNext(next.clone());
-            }
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            // No errors to handle
-            e.printStackTrace();
-        }
-        return handler;
     }
 }
