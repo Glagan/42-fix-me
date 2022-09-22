@@ -7,8 +7,6 @@ import org.glagan.router.Router;
 
 public class ForwardToBroker extends Handler {
     public boolean handle(String clientId, Message message) {
-        System.out.println("[Handler/ForwardToBroker]");
-
         String expectedFor = message.getBody().get(Dictionary.Broker);
         if (expectedFor != null) {
             if (Router.getInstance().forward(expectedFor, message)) {

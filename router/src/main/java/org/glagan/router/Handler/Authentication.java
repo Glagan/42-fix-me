@@ -5,8 +5,6 @@ import org.glagan.core.Handler.Handler;
 
 public class Authentication extends Handler {
     public boolean handle(String clientId, Message message) {
-        System.out.println("[Handler/Authentication]");
-
         if (clientId.equals(message.getHeader().getBeginString())) {
             return handleNext(clientId, message);
         }

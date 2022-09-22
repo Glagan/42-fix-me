@@ -1,14 +1,12 @@
 package org.glagan.router;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.UUID;
 
 import org.glagan.core.Message;
+import org.glagan.core.MessageInputReader;
 import org.glagan.core.MsgType;
 
 public abstract class Client implements Runnable {
@@ -35,20 +33,20 @@ public abstract class Client implements Runnable {
 
     public void run() {
         try {
-            InputStream input = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            MessageInputReader reader = new MessageInputReader(socket.getInputStream());
 
-            String text;
-            do {
-                text = reader.readLine();
-                if (text != null) {
-                    Message message = Message.fromString(text);
+            while (true) {
+                String packet = reader.read();
+                if (packet != null) {
+                    Message message = Message.fromString(packet);
                     if (message != null) {
                         System.out.println("[" + id + "] " + message.pretty());
                     }
                     onMessage(message);
+                } else {
+                    break;
                 }
-            } while (text != null);
+            }
 
             System.out.println("Closing client port " + socket.getPort());
             Router.getInstance().removeClient(this);
@@ -63,7 +61,7 @@ public abstract class Client implements Runnable {
         OutputStream output;
         try {
             output = socket.getOutputStream();
-            output.write((message.toFix() + "\n").getBytes());
+            output.write((message.toFix()).getBytes());
         } catch (IOException e) {
             System.err.println("Failed to write to socket output stream:");
             e.printStackTrace();

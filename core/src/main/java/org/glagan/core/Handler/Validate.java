@@ -7,8 +7,6 @@ import org.glagan.core.Message;
  */
 public class Validate extends Handler {
     public boolean handle(String clientId, Message message) {
-        System.out.println("[Handler/Validate]");
-
         if (!message.isCorrupted()) {
             return handleNext(clientId, message);
         }
