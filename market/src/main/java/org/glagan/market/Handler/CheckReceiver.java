@@ -6,9 +6,7 @@ import org.glagan.core.Message;
 import org.glagan.core.Handler.Handler;
 
 public class CheckReceiver extends Handler {
-    public CheckReceiver() {
-    }
-
+    @Override
     public boolean handle(Client client, Message message) {
         if (message.getBody() != null) {
             String expectedMarket = message.getBody().get(Dictionary.Market);

@@ -6,9 +6,7 @@ import org.glagan.core.Message;
 import org.glagan.core.Handler.Handler;
 
 public class CheckReceiver extends Handler {
-    public CheckReceiver() {
-    }
-
+    @Override
     public boolean handle(Client client, Message message) {
         if (message.getBody() != null) {
             String expectedBroker = message.getBody().get(Dictionary.Broker);
@@ -17,6 +15,8 @@ public class CheckReceiver extends Handler {
             } else {
                 System.out.println("Invalid receiver");
             }
+        } else {
+            System.out.println("Received nothing while expecting a Body with a valid received");
         }
         return false;
     }

@@ -48,7 +48,6 @@ public class MessageInputReader {
             try {
                 read = reader.read(charBuffer);
             } catch (IOException e) {
-                e.printStackTrace();
                 return null;
             }
             if (read > 0) {
