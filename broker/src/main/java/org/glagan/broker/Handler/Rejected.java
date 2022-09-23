@@ -17,7 +17,8 @@ public class Rejected extends Handler {
                 System.out.println("Missing required fields in Rejected(J) message (Expected OrderId(37))");
                 return false;
             }
-            System.out.println("Transaction #" + message.getBody().get(Dictionary.OrderId) + " rejected");
+            System.out.println("Transaction #" + message.getBody().get(Dictionary.OrderId) + " rejected: "
+                    + message.getBody().get(Dictionary.Text));
             return true;
         }
         return handleNext(client, message);
