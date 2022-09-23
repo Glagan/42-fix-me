@@ -1,19 +1,21 @@
 package org.glagan.router.Handler;
 
+import org.glagan.core.Client;
 import org.glagan.core.Dictionary;
 import org.glagan.core.Message;
 import org.glagan.core.Handler.Handler;
 import org.glagan.router.Router;
 
 public class ForwardToMarket extends Handler {
-    public boolean handle(String clientId, Message message) {
+    public boolean handle(Client client, Message message) {
         String expectedFor = message.getBody().get(Dictionary.Market);
         if (expectedFor != null) {
             if (Router.getInstance().forward(expectedFor, message)) {
-                System.out.println("[" + clientId + "] Forwaded message to " + expectedFor);
-                return handleNext(clientId, message);
+                System.out.println("[" + client.getId() + "] Forwaded message to " + expectedFor);
+                return handleNext(client, message);
             } else {
-                System.out.println("[" + clientId + "] Can't forward message to inexisting market " + expectedFor);
+                System.out
+                        .println("[" + client.getId() + "] Can't forward message to inexisting market " + expectedFor);
             }
         }
 

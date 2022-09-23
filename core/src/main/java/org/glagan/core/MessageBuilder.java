@@ -38,9 +38,8 @@ public class MessageBuilder {
     }
 
     public Message build() {
-        Message message = new Message(header, body);
         header.setBodyLength(body.size());
         header.setSendTime(new Date());
-        return message;
+        return new Message(header, body);
     }
 }

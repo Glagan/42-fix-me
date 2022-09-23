@@ -1,7 +1,9 @@
 package org.glagan.market;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -34,7 +36,7 @@ public class App {
         CommandLine cmd = null;
 
         String host = "localhost";
-        String marketFile = null;
+        // String marketFile = null;
         int port = 5001;
         try {
             cmd = parser.parse(options, args);
@@ -46,7 +48,7 @@ public class App {
                     System.exit(1);
                 }
             }
-            marketFile = cmd.getOptionValue("host", null);
+            // marketFile = cmd.getOptionValue("host", null);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("broker", options);
@@ -55,10 +57,14 @@ public class App {
 
         try (Socket socket = new Socket(host, port)) {
             System.out.println("Connected to " + host + ":" + port);
-            MarketClient client = new MarketClient(socket);
+            Client client = new Client(socket);
             client.run(); // The client is a Runnable that run in the main thread
+        } catch (UnknownHostException e) {
+            System.err.println("Unknown host " + host);
+        } catch (ConnectException e) {
+            System.err.println("Failed to connect to " + host + ":" + port);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Unexpected IO error: " + e.getMessage());
         }
     }
 }

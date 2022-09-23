@@ -15,7 +15,7 @@ public class Message {
     protected Header header;
     protected Map<Dictionary, String> body;
     protected Trailer trailer;
-    protected static DateFormat dateFormat = new SimpleDateFormat("YYYYMMDD-HH:mm:ss");
+    protected static DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
 
     public Message(Header header, Map<Dictionary, String> body) {
         this.header = header;
@@ -79,6 +79,7 @@ public class Message {
 
         // Check that trailer.checksum is valid
         if (trailer.getChecksum() != this.checksum()) {
+            System.out.println("Invalid CheckSum(10), found " + trailer.getChecksum() + " expected " + this.checksum());
             return true;
         }
 
@@ -255,8 +256,7 @@ public class Message {
                     + header.getMsgSeqNum() + '|';
         }
         if (header.getSendTime() != null) {
-            DateFormat formatter = new SimpleDateFormat("YYYYMMDD-HH:mm:ss");
-            String utcTimestamp = formatter.format(header.getSendTime());
+            String utcTimestamp = dateFormat.format(header.getSendTime());
             result += Dictionary.SendingTime.getName() + "(" + Dictionary.SendingTime.getValue() + ")=" + utcTimestamp
                     + '|';
         }
@@ -285,8 +285,7 @@ public class Message {
             result += Dictionary.MsgSeqNum.getValue() + "=" + header.getMsgSeqNum() + (char) 0x1;
         }
         if (header.getSendTime() != null) {
-            DateFormat formatter = new SimpleDateFormat("YYYYMMDD-HH:mm:ss");
-            String utcTimestamp = formatter.format(header.getSendTime());
+            String utcTimestamp = dateFormat.format(header.getSendTime());
             result += Dictionary.SendingTime.getValue() + "=" + utcTimestamp + (char) 0x1;
         }
 

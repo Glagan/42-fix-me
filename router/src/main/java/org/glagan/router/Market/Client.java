@@ -21,7 +21,7 @@ public class Client extends RouterClient {
 
     public void onMessage(Message message) {
         if (message != null) {
-            handler.handle(id, message);
+            handler.handle(this, message);
         }
     }
 }

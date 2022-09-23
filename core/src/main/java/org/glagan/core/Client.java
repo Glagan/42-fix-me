@@ -46,9 +46,9 @@ public class Client implements Runnable {
                     Message message = Message.fromString(packet);
                     if (message != null) {
                         if (id != null) {
-                            System.out.print("[" + id + "] ");
+                            System.out.print("[" + id + "]");
                         }
-                        System.out.println(message.pretty());
+                        System.out.println("<" + message.pretty());
                     }
                     onMessage(message);
                 } else {
@@ -67,7 +67,11 @@ public class Client implements Runnable {
         OutputStream output;
         try {
             output = socket.getOutputStream();
-            output.write((message.toFix()).getBytes());
+            output.write(message.toFix().getBytes());
+            if (id != null) {
+                System.out.print("[" + id + "]");
+            }
+            System.out.println(">" + message.pretty());
         } catch (IOException e) {
             System.err.println("Failed to write to socket output stream:");
             e.printStackTrace();

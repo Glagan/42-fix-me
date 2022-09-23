@@ -1,5 +1,6 @@
 package org.glagan.core.Handler;
 
+import org.glagan.core.Client;
 import org.glagan.core.Message;
 
 /**
@@ -8,11 +9,11 @@ import org.glagan.core.Message;
 public abstract class Handler {
     protected Handler next;
 
-    abstract public boolean handle(String clientId, Message message);
+    abstract public boolean handle(Client client, Message message);
 
-    final public boolean handleNext(String clientId, Message message) {
+    final public boolean handleNext(Client client, Message message) {
         if (next != null) {
-            return next.handle(clientId, message);
+            return next.handle(client, message);
         }
         return true;
     }
