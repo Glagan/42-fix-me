@@ -17,6 +17,8 @@ public class ForwardToMarket extends Handler {
                 System.out
                         .println("[" + client.getId() + "] Can't forward message to inexisting market " + expectedFor);
             }
+        } else {
+            System.out.println("[" + client.getId() + "] Missing target in message to forward");
         }
 
         return false;

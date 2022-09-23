@@ -17,6 +17,8 @@ public class ForwardToBroker extends Handler {
                 System.out
                         .println("[" + client.getId() + "] Can't forward message to inexisting broker " + expectedFor);
             }
+        } else {
+            System.out.println("[" + client.getId() + "] Missing target in message to forward");
         }
 
         return false;

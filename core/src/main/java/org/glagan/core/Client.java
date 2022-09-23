@@ -48,7 +48,7 @@ public class Client implements Runnable {
                         if (id != null) {
                             System.out.print("[" + id + "]");
                         }
-                        System.out.println("<" + message.pretty());
+                        System.out.println(">" + message.pretty());
                     }
                     onMessage(message);
                 } else {
@@ -71,7 +71,7 @@ public class Client implements Runnable {
             if (id != null) {
                 System.out.print("[" + id + "]");
             }
-            System.out.println(">" + message.pretty());
+            System.out.println("<" + message.pretty());
         } catch (IOException e) {
             System.err.println("Failed to write to socket output stream:");
             e.printStackTrace();

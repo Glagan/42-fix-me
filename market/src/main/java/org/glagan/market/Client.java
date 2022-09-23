@@ -2,6 +2,7 @@ package org.glagan.market;
 
 import java.net.Socket;
 
+import org.glagan.market.Handler.Buy;
 import org.glagan.market.Handler.CheckReceiver;
 import org.glagan.core.Message;
 import org.glagan.core.Handler.BaseHandler;
@@ -17,7 +18,8 @@ public class Client extends org.glagan.core.Client {
         this.chain = new BaseHandler();
         this.chain.setNext(new Validate())
                 .setNext(new Logon())
-                .setNext(new CheckReceiver());
+                .setNext(new CheckReceiver())
+                .setNext(new Buy());
     }
 
     @Override

@@ -19,6 +19,7 @@ public class Client extends RouterClient {
                 .setNext(new ForwardToBroker());
     }
 
+    @Override
     public void onMessage(Message message) {
         if (message != null) {
             handler.handle(this, message);

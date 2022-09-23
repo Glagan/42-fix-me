@@ -1,8 +1,8 @@
 package org.glagan.router.Handler;
 
-import org.glagan.core.Client;
 import org.glagan.core.Message;
 import org.glagan.core.Handler.Handler;
+import org.glagan.core.Client;
 
 public class Authentication extends Handler {
     public boolean handle(Client client, Message message) {

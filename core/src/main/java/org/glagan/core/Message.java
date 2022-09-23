@@ -86,6 +86,21 @@ public class Message {
         return false;
     }
 
+    public boolean hasRequiredFields(Dictionary[] fields) {
+        if (fields != null && body == null) {
+            return false;
+        }
+        if (fields != null) {
+            for (Dictionary field : fields) {
+                String value = body.get(field);
+                if (value == null || value.equals("")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public static Message fromString(String buffer) {
         if (buffer == null) {
             return null;
