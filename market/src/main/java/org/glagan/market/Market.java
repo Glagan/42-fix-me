@@ -7,7 +7,6 @@ public class Market {
     public Market() {
         this.instruments = new Instrument[1];
         this.instruments[0] = new Instrument("Test", 4242);
-        System.out.println("Instrument: " + this.instruments[0].getId());
     }
 
     public boolean hasInstrument(String id) {
@@ -40,5 +39,13 @@ public class Market {
 
     static public Market getInstance() {
         return Market.instance;
+    }
+
+    static public void printInstruments() {
+        System.out.println("---- Instruments");
+        for (Instrument instrument : instance.instruments) {
+            System.out.println(instrument.toString());
+        }
+        System.out.println("----");
     }
 }

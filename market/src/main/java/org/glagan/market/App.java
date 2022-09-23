@@ -55,6 +55,11 @@ public class App {
             System.exit(1);
         }
 
+        // TODO parse market file
+
+        // Show Market instruments to be able to use them in Brokers
+        Market.printInstruments();
+
         try (Socket socket = new Socket(host, port)) {
             System.out.println("Connected to " + host + ":" + port);
             Client client = new Client(socket);

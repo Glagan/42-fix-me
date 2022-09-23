@@ -44,4 +44,8 @@ public class Instrument {
         }
         return false;
     }
+
+    public String toString() {
+        return id + "\t" + String.format("%6d", quantity) + "\t" + name;
+    }
 }
