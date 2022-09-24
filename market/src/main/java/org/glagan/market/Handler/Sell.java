@@ -12,6 +12,17 @@ public class Sell extends Handler {
     protected static Dictionary[] requiredFields = { Dictionary.OrderId, Dictionary.Instrument, Dictionary.Quantity,
             Dictionary.Price };
 
+    protected void sendRejected(Client client, Message message, String text) {
+        Message rejected = Message.make(MsgType.Rejected)
+                .auth(client.getId())
+                .continueFrom(1)
+                .add(Dictionary.Broker, message.getHeader().getBeginString())
+                .add(Dictionary.OrderId, message.getBody().get(Dictionary.OrderId))
+                .add(Dictionary.Text, text)
+                .build();
+        client.send(rejected);
+    }
+
     @Override
     public boolean handle(Client client, Message message) {
         if (message.getHeader().getMsgType().equals(MsgType.Sell)) {
@@ -23,13 +34,19 @@ public class Sell extends Handler {
             }
             int quantity = Integer.parseInt(message.getBody().get(Dictionary.Quantity));
             if (quantity < 1) {
-                System.out.println("The trading Quantity(53) must greater than zero");
+                System.out.println("The trading Quantity(53) must be greater than zero");
+                return false;
+            }
+            double price = Double.parseDouble(message.getBody().get(Dictionary.Price));
+            if (price <= 0 || Double.isNaN(price)) {
+                System.out.println("The trading Price(65) must be valid and greater than zero");
                 return false;
             }
             Instrument instrument = Market.getInstrument(message.getBody().get(Dictionary.Instrument));
             if (instrument == null) {
                 System.out.println(
                         "This Market does not trade this Instrument (" + message.getBody().get(Dictionary.Instrument));
+                sendRejected(client, message, "This Market does not trade this instrument");
                 return false;
             }
             instrument.buy(quantity);
