@@ -26,7 +26,7 @@ public class Sell extends Handler {
                 System.out.println("The trading Quantity(53) must greater than zero");
                 return false;
             }
-            Instrument instrument = Market.getInstance().getInstrument(message.getBody().get(Dictionary.Instrument));
+            Instrument instrument = Market.getInstrument(message.getBody().get(Dictionary.Instrument));
             if (instrument == null) {
                 System.out.println(
                         "This Market does not trade this Instrument (" + message.getBody().get(Dictionary.Instrument));

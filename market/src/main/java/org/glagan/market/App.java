@@ -26,7 +26,7 @@ public class App {
         portOption.setRequired(false);
         options.addOption(portOption);
 
-        Option marketFileOption = new Option("f", "file", true, "market file");
+        Option marketFileOption = new Option("f", "file", true, "market file path");
         marketFileOption.setType(Number.class);
         marketFileOption.setRequired(false);
         options.addOption(marketFileOption);
@@ -36,7 +36,7 @@ public class App {
         CommandLine cmd = null;
 
         String host = "localhost";
-        // String marketFile = null;
+        String marketFilePath = null;
         int port = 5001;
         try {
             cmd = parser.parse(options, args);
@@ -48,14 +48,20 @@ public class App {
                     System.exit(1);
                 }
             }
-            // marketFile = cmd.getOptionValue("host", null);
+            marketFilePath = cmd.getOptionValue("file", null);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("broker", options);
             System.exit(1);
         }
 
-        // TODO parse market file
+        // Parse and handle market file
+        if (marketFilePath != null) {
+            Market.loadFromFilePath(marketFilePath);
+        }
+        if (!Market.hasInstruments()) {
+            Market.generateRandom(5);
+        }
 
         // Show Market instruments to be able to use them in Brokers
         Market.printInstruments();
