@@ -15,7 +15,7 @@ public class Logon extends Handler {
         if (!hasId) {
             if (message.getHeader().getMsgType().equals(MsgType.Logon)) {
                 client.setId(message.getHeader().getBeginString());
-                System.out.println("Assigned ID " + client.getId());
+                System.out.println("Assigned ID \u001B[36m" + client.getId() + "\u001B[0m");
                 hasId = true;
                 return true;
             }

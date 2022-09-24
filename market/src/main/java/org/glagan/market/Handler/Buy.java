@@ -36,11 +36,11 @@ public class Buy extends Handler {
             // Validate the required fields
             if (!message.hasRequiredFields(requiredFields)) {
                 System.out.println(
-                        "Missing required fields in Buy(D) message (Expected OrderId(37), Market(64), Broker(74), Instrument(42), Quantity(53) and Price(65)");
+                        "Missing required fields in Buy(D) message (Expected OrderId(37), Market(64), Instrument(42), Quantity(53) and Price(65)");
                 return false;
             }
 
-            if (!message.validateId(message.getBody().get(Dictionary.Broker))) {
+            if (!message.validateId(message.getHeader().getBeginString())) {
                 System.out.println(
                         "Invaild Broker(74) ID format");
                 return false;

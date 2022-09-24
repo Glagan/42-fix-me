@@ -57,7 +57,7 @@ public class App {
         try {
             // * Client
             socket = new Socket(host, port);
-            System.out.println("Connected to " + host + ":" + port);
+            System.out.println("\u001B[36mConnected to \u001B[0m" + host + ":" + port);
             Client client = new Client(socket);
             // Start the Client in a thread to handle the input loop in the main thread
             Thread thread = new Thread(client);

@@ -108,7 +108,7 @@ public class App {
         Market.printInstruments();
 
         try (Socket socket = new Socket(host, port)) {
-            System.out.println("Connected to " + host + ":" + port);
+            System.out.println("\u001B[36mConnected to \u001B[0m" + host + ":" + port);
             Client client = new Client(socket, database);
             client.run(); // The client is a Runnable that run in the main thread
         } catch (UnknownHostException e) {
