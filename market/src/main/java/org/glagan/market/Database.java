@@ -60,6 +60,7 @@ public class Database implements Runnable {
             System.out.println("\u001B[36mConnected to database \u001B[0m" + host + ":" + port + "@" + name);
         } catch (SQLException e) {
             System.err.println("\u001B[31m" + e.getMessage() + "\u001B[0m");
+            System.err.println("\u001B[31mTransactions will not be logged to the database\u001B[0m");
         }
     }
 

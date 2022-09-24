@@ -18,7 +18,7 @@ public class Buy extends Handler {
         this.database = database;
     }
 
-    protected void sendRejected(Client client, Message message, String text) {
+    protected void sendAndLogRejected(Client client, Message message, String text) {
         Message rejected = Message.make(MsgType.Rejected)
                 .auth(client.getId())
                 .continueFrom(1)
@@ -42,13 +42,13 @@ public class Buy extends Handler {
 
             if (!message.validateId(message.getHeader().getBeginString())) {
                 System.out.println(
-                        "Invaild Broker(74) ID format");
+                        "Invalid Broker(74) ID format");
                 return false;
             }
 
             if (!message.validateId(message.getBody().get(Dictionary.Instrument))) {
                 System.out.println(
-                        "Invaild Instrument(42) ID format");
+                        "Invalid Instrument(42) ID format");
                 return false;
             }
 
@@ -86,19 +86,17 @@ public class Buy extends Handler {
 
             Instrument instrument = Market.getInstrument(message.getBody().get(Dictionary.Instrument));
             if (instrument == null) {
-                System.out.println(
-                        "This Market does not trade this Instrument (" + message.getBody().get(Dictionary.Instrument));
-                sendRejected(client, message, "This Market does not trade this instrument");
+                sendAndLogRejected(client, message, "This Market does not trade this instrument");
                 return false;
             }
 
             // Process the transaction
             if (!instrument.sell(quantity)) {
-                System.out.println("This Market does not have enough quantity to process the transaction");
-                sendRejected(client, message, "This Market does not have enough quantity to process the transaction");
+                sendAndLogRejected(client, message,
+                        "This Market does not have enough quantity to process the transaction");
                 return false;
             }
-            System.out.println("Transaction processed");
+            System.out.println("\u001B[32mTransaction processed\u001B[0m");
             Message executed = Message.make(MsgType.Executed)
                     .auth(client.getId())
                     .continueFrom(1)

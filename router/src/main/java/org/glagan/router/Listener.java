@@ -1,6 +1,7 @@
 package org.glagan.router;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -30,9 +31,10 @@ public abstract class Listener implements Runnable {
                 onConnection(socket, client);
                 new Thread(client).start();
             }
+        } catch (BindException e) {
+            System.err.println("\u001B[31mFailed to bind to port\u001B[0m " + port);
         } catch (IOException e) {
-            System.err.println("Failed to open socket server:");
-            e.printStackTrace();
+            System.err.println("\u001B[31mFailed to open socket server: \u001B[0m" + e.getMessage());
         }
     }
 

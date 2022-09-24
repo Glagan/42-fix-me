@@ -17,7 +17,8 @@ public class Executed extends Handler {
                 System.out.println("Missing required fields in Executed(EX) message (Expected OrderId(37))");
                 return false;
             }
-            System.out.println("Transaction #" + message.getBody().get(Dictionary.OrderId) + " executed");
+            System.out.println(
+                    "\u001B[32mTransaction #" + message.getBody().get(Dictionary.OrderId) + " executed\u001B[0m");
             return true;
         }
         return handleNext(client, message);

@@ -91,7 +91,7 @@ public class App {
             System.exit(1);
         }
 
-        // Create the Database connection pool
+        // Create the Database and run the blocking queue in a thread
         Database database = new Database(databaseHost, databasePort, databaseUser, databasePassword, databaseName);
         Thread databaseThread = new Thread(database);
         databaseThread.start();
