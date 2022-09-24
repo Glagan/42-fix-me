@@ -92,8 +92,9 @@ public class App {
         }
 
         // Create the Database connection pool
-        Database database = new Database();
-        database.connect(databaseHost, databasePort, databaseUser, databasePassword, databaseName);
+        Database database = new Database(databaseHost, databasePort, databaseUser, databasePassword, databaseName);
+        Thread databaseThread = new Thread(database);
+        databaseThread.start();
 
         // Parse and handle market file
         if (marketFilePath != null) {
@@ -108,7 +109,7 @@ public class App {
 
         try (Socket socket = new Socket(host, port)) {
             System.out.println("Connected to " + host + ":" + port);
-            Client client = new Client(socket);
+            Client client = new Client(socket, database);
             client.run(); // The client is a Runnable that run in the main thread
         } catch (UnknownHostException e) {
             System.err.println("Unknown host " + host);
@@ -120,5 +121,6 @@ public class App {
 
         // Cleanup
         database.close();
+        databaseThread.interrupt();
     }
 }

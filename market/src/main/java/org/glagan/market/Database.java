@@ -4,15 +4,29 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import org.glagan.core.Dictionary;
 import org.glagan.core.Message;
 
-public class Database {
+public class Database implements Runnable {
     protected Connection connection;
+    protected BlockingQueue<Transaction> queue;
+    protected String host;
+    protected int port;
+    protected String user;
+    protected String password;
+    protected String name;
 
-    public Database() {
+    public Database(String host, int port, String user, String password, String name) {
+        this.host = host;
+        this.port = port;
+        this.user = user;
+        this.password = password;
+        this.name = name;
         this.connection = null;
+        this.queue = new ArrayBlockingQueue<>(1024);
     }
 
     public void connect(String host, int port, String user, String password, String name) {
@@ -52,6 +66,13 @@ public class Database {
         return connection;
     }
 
+    public void pushTransaction(Message message, String status) {
+        if (connection == null) {
+            return;
+        }
+        queue.add(new Transaction(message, status));
+    }
+
     /**
      * The given message is **not** checked for validity, and expect all values to
      * be correctly converted and valid for the database
@@ -65,8 +86,9 @@ public class Database {
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, message.getBody().get(Dictionary.Market));
-            statement.setString(2, message.getBody().get(Dictionary.BeginString));
-            statement.setString(3, message.getBody().get(Dictionary.OrderId));
+            statement.setString(2, message.getHeader().getBeginString());
+            int orderId = Integer.parseInt(message.getBody().get(Dictionary.OrderId));
+            statement.setInt(3, orderId);
             statement.setString(4, message.getBody().get(Dictionary.Instrument));
             int quantity = Integer.parseInt(message.getBody().get(Dictionary.Quantity));
             statement.setInt(5, quantity);
@@ -83,6 +105,21 @@ public class Database {
         }
     }
 
+    public void run() {
+        connect(host, port, user, password, name);
+        if (connection != null) {
+            try {
+                while (!connection.isClosed()) {
+                    Transaction transaction = queue.take();
+                    saveTransaction(transaction.getMessage(), transaction.getStatus());
+                }
+            } catch (InterruptedException | SQLException e) {
+                // Ignore expected interrupts
+            }
+            close();
+        }
+    }
+
     public void close() {
         if (connection != null) {
             try {
@@ -92,6 +129,7 @@ public class Database {
             } catch (SQLException e) {
                 System.out.println("\u001B[31mFailed to close database\u001B[0m");
             }
+            connection = null;
         }
     }
 }

@@ -14,14 +14,14 @@ import org.glagan.core.Handler.Validate;
 public class Client extends org.glagan.core.Client {
     protected Handler chain;
 
-    public Client(Socket socket) {
+    public Client(Socket socket, Database database) {
         super(socket);
         this.chain = new BaseHandler();
         this.chain.setNext(new Validate())
                 .setNext(new Logon())
                 .setNext(new CheckReceiver())
-                .setNext(new Buy())
-                .setNext(new Sell());
+                .setNext(new Buy(database))
+                .setNext(new Sell(database));
     }
 
     @Override

@@ -101,6 +101,10 @@ public class Message {
         return true;
     }
 
+    public boolean validateId(String id) {
+        return id != null && id.length() == 36;
+    }
+
     public static Message fromString(String buffer) {
         if (buffer == null) {
             return null;
