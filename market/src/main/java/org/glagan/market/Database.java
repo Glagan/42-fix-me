@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.glagan.core.Dictionary;
 import org.glagan.core.Message;
@@ -110,8 +111,10 @@ public class Database implements Runnable {
         if (connection != null) {
             try {
                 while (!connection.isClosed()) {
-                    Transaction transaction = queue.take();
-                    saveTransaction(transaction.getMessage(), transaction.getStatus());
+                    Transaction transaction = queue.poll(1, TimeUnit.SECONDS);
+                    if (transaction != null) {
+                        saveTransaction(transaction.getMessage(), transaction.getStatus());
+                    }
                 }
             } catch (InterruptedException | SQLException e) {
                 // Ignore expected interrupts
