@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  database:
+    image: postgres:14.5-alpine
+    restart: unless-stopped
+    env_file:
+      - ./database/.env
+    ports:
+      - "5442:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  adminer:
+    image: adminer:4.8.1-standalone
+    depends_on:
+      - database
+    ports:
+      - 5050:8080
+    restart: unless-stopped
+    links:
+      - database
+
+volumes:
+  database-data:
+    driver: local
