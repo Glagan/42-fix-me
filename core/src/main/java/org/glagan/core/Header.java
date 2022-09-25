@@ -6,7 +6,6 @@ public class Header {
     protected String beginString;
     protected int bodyLength;
     protected MsgType msgType;
-    protected int msgSeqNum;
     protected Date sendTime;
 
     public Header() {
@@ -36,14 +35,6 @@ public class Header {
         this.msgType = msgType;
     }
 
-    public int getMsgSeqNum() {
-        return msgSeqNum;
-    }
-
-    public void setMsgSeqNum(int msgSeqNum) {
-        this.msgSeqNum = msgSeqNum;
-    }
-
     public Date getSendTime() {
         return sendTime;
     }
@@ -58,11 +49,6 @@ public class Header {
         if (msgType != null) {
             total += String.valueOf(Dictionary.MsgType.getValue()).length() + 1;
             total += msgType.getValue().length() + 1;
-        }
-
-        if (msgSeqNum > 0) {
-            total += String.valueOf(Dictionary.MsgSeqNum.getValue()).length() + 1;
-            total += String.valueOf(msgSeqNum).length() + 1;
         }
 
         if (sendTime != null) {

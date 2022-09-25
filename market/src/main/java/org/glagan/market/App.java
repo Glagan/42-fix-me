@@ -116,7 +116,7 @@ public class App {
             Thread thread = new Thread(client);
             thread.start();
             // Send Logon
-            client.send(Message.make(MsgType.Logon).auth("fix-me").continueFrom(1).build());
+            client.send(Message.make(MsgType.Logon).auth("fix-me").build());
             thread.join();
         } catch (UnknownHostException e) {
             System.err.println("Unknown host " + host);

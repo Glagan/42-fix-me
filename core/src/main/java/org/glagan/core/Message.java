@@ -44,11 +44,6 @@ public class Message {
             // MsgType(35)
             total += String.valueOf(Dictionary.MsgType.getValue()).length() + 1; // + '='
             total += String.valueOf(header.getMsgType().getValue()).length() + 1; // + 'SOH'
-            // MsgSeqNum(34)
-            if (header.getMsgSeqNum() > 0) {
-                total += String.valueOf(Dictionary.MsgSeqNum.getValue()).length() + 1; // + '='
-                total += String.valueOf(header.getMsgSeqNum()).length() + 1; // + 'SOH'
-            }
             // SendingTime(52)
             if (header.getSendTime() != null) {
                 String utcTimestamp = dateFormat.format(header.getSendTime());
@@ -123,7 +118,6 @@ public class Message {
         int checksum = 0;
 
         boolean foundBodyLength = false;
-        boolean foundMsgSeqNum = false;
         boolean foundCheckSum = false;
 
         for (int i = 0; i < parts.length; i++) {
@@ -178,17 +172,9 @@ public class Message {
                     }
                     header.setMsgType(msgType);
                     break;
-                case MsgSeqNum:
-                    if (i != 3) {
-                        System.out.println("MsgSeqNum(34) should be on the fourth position");
-                        return null;
-                    }
-                    foundMsgSeqNum = true;
-                    header.setMsgSeqNum(Integer.parseInt(pair[1]));
-                    break;
                 case SendingTime:
-                    if (i != 4) {
-                        System.out.println("SendingTime(52) should be on the fifth position");
+                    if (i != 3) {
+                        System.out.println("SendingTime(52) should be on the fourth position");
                         return null;
                     }
                     try {
@@ -229,14 +215,6 @@ public class Message {
             System.out.println("MsgType(35) is required");
             return null;
         }
-        if (!foundMsgSeqNum) {
-            System.out.println("MsgSeqNum(34) is required");
-            return null;
-        }
-        if (header.getMsgSeqNum() <= 0) {
-            System.out.println("MsgSeqNum(34) should be greater than 0");
-            return null;
-        }
         if (header.getSendTime() == null) {
             System.out.println("SendingTime(52) is required");
             return null;
@@ -270,10 +248,6 @@ public class Message {
                 + header.getBodyLength() + '|';
         result += Dictionary.MsgType.getName() + "(" + Dictionary.MsgType.getValue() + ")="
                 + header.getMsgType().getValue() + '|';
-        if (header.getMsgSeqNum() > 0) {
-            result += Dictionary.MsgSeqNum.getName() + "(" + Dictionary.MsgSeqNum.getValue() + ")="
-                    + header.getMsgSeqNum() + '|';
-        }
         if (header.getSendTime() != null) {
             String utcTimestamp = dateFormat.format(header.getSendTime());
             result += Dictionary.SendingTime.getName() + "(" + Dictionary.SendingTime.getValue() + ")=" + utcTimestamp
@@ -300,9 +274,6 @@ public class Message {
         String result = Dictionary.BeginString.getValue() + "=" + header.getBeginString() + (char) 0x1;
         result += Dictionary.BodyLength.getValue() + "=" + header.getBodyLength() + (char) 0x1;
         result += Dictionary.MsgType.getValue() + "=" + header.getMsgType().getValue() + (char) 0x1;
-        if (header.getMsgSeqNum() > 0) {
-            result += Dictionary.MsgSeqNum.getValue() + "=" + header.getMsgSeqNum() + (char) 0x1;
-        }
         if (header.getSendTime() != null) {
             String utcTimestamp = dateFormat.format(header.getSendTime());
             result += Dictionary.SendingTime.getValue() + "=" + utcTimestamp + (char) 0x1;

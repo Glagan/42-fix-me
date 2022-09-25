@@ -1,12 +1,9 @@
 package org.glagan.core;
 
 public enum Dictionary {
-    BeginSeqNo("BeginSeqNo", 7),
-    EndSeqNo("EndSeqNo", 16),
     BeginString("BeginString", 8),
     BodyLength("BodyLength", 9),
     MsgType("MsgType", 35),
-    MsgSeqNum("MsgSeqNum", 34),
     SendingTime("SendingTime", 52),
     OrderId("OrderId", 37),
     Instrument("Instrument", 42),
@@ -14,9 +11,6 @@ public enum Dictionary {
     Market("Market", 64),
     Broker("Broker", 74),
     Price("Price", 65),
-    TestReqId("TestReqId", 112),
-    RefSeqNum("RefSeqNum", 45),
-    RefMsgType("RefMsgType", 372),
     Text("Text", 58),
     CheckSum("CheckSum", 10);
 

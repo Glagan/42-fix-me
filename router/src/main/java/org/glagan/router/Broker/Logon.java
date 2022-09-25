@@ -16,7 +16,7 @@ public class Logon extends Handler {
             }
 
             client.setId(UUID.randomUUID().toString());
-            client.send(Message.make(MsgType.Logon).auth(client.getId()).continueFrom(1).build());
+            client.send(Message.make(MsgType.Logon).auth(client.getId()).build());
             Router.getInstance().addBroker(client);
             System.out.println("[" + client.getId() + "] Connected new Broker");
             return true;

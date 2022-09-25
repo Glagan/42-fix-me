@@ -21,7 +21,6 @@ public class Sell extends Handler {
     protected void sendAndLogRejected(Client client, Message message, String text) {
         Message rejected = Message.make(MsgType.Rejected)
                 .auth(client.getId())
-                .continueFrom(1)
                 .add(Dictionary.Broker, message.getHeader().getBeginString())
                 .add(Dictionary.OrderId, message.getBody().get(Dictionary.OrderId))
                 .add(Dictionary.Text, text)
@@ -94,7 +93,6 @@ public class Sell extends Handler {
             System.out.println("\u001B[32mTransaction processed\u001B[0m");
             Message executed = Message.make(MsgType.Executed)
                     .auth(client.getId())
-                    .continueFrom(1)
                     .add(Dictionary.Broker, message.getHeader().getBeginString())
                     .add(Dictionary.OrderId, message.getBody().get(Dictionary.OrderId))
                     .build();

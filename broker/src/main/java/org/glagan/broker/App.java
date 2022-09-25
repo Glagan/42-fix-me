@@ -63,7 +63,7 @@ public class App {
             Thread thread = new Thread(client);
             thread.start();
             // Send Logon
-            client.send(Message.make(MsgType.Logon).auth("fix-me").continueFrom(1).build());
+            client.send(Message.make(MsgType.Logon).auth("fix-me").build());
 
             // * Input loop
             int nextOrder = 1;
@@ -102,7 +102,7 @@ public class App {
                                 System.out.println("\u001B[36m" + input + "\u001B[0m");
                                 client.send(
                                         Message.make(MsgType.Buy)
-                                                .auth(client.getId()).continueFrom(1)
+                                                .auth(client.getId())
                                                 .add(Dictionary.OrderId, "" + nextOrder++)
                                                 .add(Dictionary.Market, parts[1])
                                                 .add(Dictionary.Instrument, parts[2])
@@ -120,7 +120,7 @@ public class App {
                                 System.out.println("\u001B[36m" + input + "\u001B[0m");
                                 client.send(
                                         Message.make(MsgType.Sell)
-                                                .auth(client.getId()).continueFrom(1)
+                                                .auth(client.getId())
                                                 .add(Dictionary.OrderId, "" + nextOrder++)
                                                 .add(Dictionary.Market, parts[1])
                                                 .add(Dictionary.Instrument, parts[2])

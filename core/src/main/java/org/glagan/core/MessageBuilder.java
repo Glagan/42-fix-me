@@ -25,11 +25,6 @@ public class MessageBuilder {
         return this;
     }
 
-    public MessageBuilder continueFrom(int msgSeqNum) {
-        header.setMsgSeqNum(msgSeqNum);
-        return this;
-    }
-
     public MessageBuilder add(Dictionary key, String value) {
         if (value != null) {
             body.put(key, value);
