@@ -12,7 +12,8 @@ public enum Dictionary {
     Broker("Broker", 74),
     Price("Price", 65),
     Text("Text", 58),
-    CheckSum("CheckSum", 10);
+    CheckSum("CheckSum", 10),
+    Token("Token", 50);
 
     private String name;
     private int value;
