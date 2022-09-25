@@ -30,7 +30,10 @@ public class Logon extends Handler {
                 reconnected = true;
             }
 
-            // TODO Check if another user is already connected with this token
+            // Check if another user is already connected with this token
+            if (Router.getInstance().isConnected(id)) {
+                return false;
+            }
 
             client.setId(id);
             client.send(Message.make(MsgType.Logon).auth(client.getId()).add(Dictionary.Token, token).build());

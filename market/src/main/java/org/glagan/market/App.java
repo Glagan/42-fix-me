@@ -12,7 +12,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glagan.core.Dictionary;
 import org.glagan.core.Message;
+import org.glagan.core.MessageBuilder;
 import org.glagan.core.MsgType;
 
 public class App {
@@ -53,10 +55,16 @@ public class App {
         databasePasswordOption.setRequired(false);
         options.addOption(databasePasswordOption);
 
+        Option tokenOption = new Option("t", "token", true, "reconnect token");
+        tokenOption.setType(Number.class);
+        tokenOption.setRequired(false);
+        options.addOption(tokenOption);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
 
+        String token = null;
         String host = "localhost";
         String marketFilePath = null;
         String databaseHost = "localhost";
@@ -87,6 +95,7 @@ public class App {
             databaseName = cmd.getOptionValue("db-name", "fix-me");
             databaseUser = cmd.getOptionValue("db-user", "admin");
             databasePassword = cmd.getOptionValue("db-password", "admin");
+            token = cmd.getOptionValue("token", null);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("broker", options);
@@ -116,7 +125,11 @@ public class App {
             Thread thread = new Thread(client);
             thread.start();
             // Send Logon
-            client.send(Message.make(MsgType.Logon).auth("fix-me").build());
+            MessageBuilder logonMessage = Message.make(MsgType.Logon).auth("fix-me");
+            if (token != null) {
+                logonMessage.add(Dictionary.Token, token);
+            }
+            client.send(logonMessage.build());
             thread.join();
         } catch (UnknownHostException e) {
             System.err.println("Unknown host " + host);

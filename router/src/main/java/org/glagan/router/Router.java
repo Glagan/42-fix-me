@@ -63,6 +63,10 @@ public class Router {
         pendingClients.remove(client);
     }
 
+    public synchronized boolean isConnected(String id) {
+        return clients.get(id) != null;
+    }
+
     public synchronized boolean hasPendingMessages(String id) {
         List<Message> pendingMessages = this.pendingMessages.get(id);
         return pendingMessages != null && pendingMessages.size() > 0;

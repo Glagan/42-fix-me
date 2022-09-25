@@ -80,17 +80,19 @@ public class Market {
                 String[] lines = content.split("\n");
                 for (String line : lines) {
                     String[] parts = line.split("\\|");
-                    if (parts.length != 2) {
+                    if (parts.length != 3) {
                         System.out.println(
                                 "\u001B[33mInvalid Market entry: \u001B[0m" + line + "(" + parts.length + ")");
                         continue;
                     }
                     try {
-                        int quantity = Integer.parseInt(parts[1]);
+                        int quantity = Integer.parseInt(parts[2]);
                         if (quantity < 0) {
                             throw new NumberFormatException();
                         }
-                        instruments.add(new Instrument(parts[0], quantity));
+                        Instrument instrument = new Instrument(parts[1], quantity);
+                        instrument.setId(parts[0]);
+                        instruments.add(instrument);
                     } catch (NumberFormatException e) {
                         System.out.println("\u001B[33mInvalid Market quantity: \u001B[0m" + parts[1]);
                     }
