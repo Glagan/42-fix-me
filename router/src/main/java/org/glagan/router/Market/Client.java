@@ -15,7 +15,8 @@ public class Client extends RouterClient {
     public Client(Socket socket) {
         super(socket);
         handler = new BaseHandler();
-        handler.setNext(new Authentication())
+        handler.setNext(new Logon())
+                .setNext(new Authentication())
                 .setNext(new ForwardToBroker());
     }
 

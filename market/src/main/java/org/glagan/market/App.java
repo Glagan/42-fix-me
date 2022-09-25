@@ -12,6 +12,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glagan.core.Message;
+import org.glagan.core.MsgType;
 
 public class App {
     public static void main(String[] args) {
@@ -110,13 +112,20 @@ public class App {
         try (Socket socket = new Socket(host, port)) {
             System.out.println("\u001B[36mConnected to \u001B[0m" + host + ":" + port);
             Client client = new Client(socket, database);
-            client.run(); // The client is a Runnable that run in the main thread
+            // Start the client in a thread to be able to send the Logon message
+            Thread thread = new Thread(client);
+            thread.start();
+            // Send Logon
+            client.send(Message.make(MsgType.Logon).auth("fix-me").continueFrom(1).build());
+            thread.join();
         } catch (UnknownHostException e) {
             System.err.println("Unknown host " + host);
         } catch (ConnectException e) {
             System.err.println("Failed to connect to " + host + ":" + port);
         } catch (IOException e) {
             System.err.println("Unexpected IO error: " + e.getMessage());
+        } catch (InterruptedException e) {
+            // Ignore expected error
         }
 
         // Cleanup

@@ -6,6 +6,11 @@ import org.glagan.core.Client;
 
 public class Authentication extends Handler {
     public boolean handle(Client client, Message message) {
+        if (client.getId() == null) {
+            System.out.println("Pending client " + client);
+            return false;
+        }
+
         if (client.getId().equals(message.getHeader().getBeginString())) {
             return handleNext(client, message);
         }

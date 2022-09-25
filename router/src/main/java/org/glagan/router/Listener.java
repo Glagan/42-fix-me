@@ -20,15 +20,13 @@ public abstract class Listener implements Runnable {
 
     public abstract Client createClient(Socket socket);
 
-    public abstract void onConnection(Socket socket, Client client);
-
     public void run() {
         try (ServerSocket server = new ServerSocket(port)) {
             System.out.println("Listening on port " + port);
             while (true) {
                 Socket socket = server.accept();
                 Client client = createClient(socket);
-                onConnection(socket, client);
+                Router.getInstance().addPending(client);
                 new Thread(client).start();
             }
         } catch (BindException e) {

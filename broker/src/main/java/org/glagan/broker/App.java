@@ -62,6 +62,8 @@ public class App {
             // Start the Client in a thread to handle the input loop in the main thread
             Thread thread = new Thread(client);
             thread.start();
+            // Send Logon
+            client.send(Message.make(MsgType.Logon).auth("fix-me").continueFrom(1).build());
 
             // * Input loop
             int nextOrder = 1;
