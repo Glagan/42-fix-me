@@ -58,7 +58,7 @@ public class Client implements Runnable {
         } catch (IOException e) {
             // Ignore IOExceptions -- they are expected
         } finally {
-            System.out.println("Closing port " + socket.getPort());
+            System.out.println("Closing connection to port " + socket.getPort());
             onClose();
         }
     }

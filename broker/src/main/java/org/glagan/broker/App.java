@@ -76,9 +76,14 @@ public class App {
                             + "\n----");
             boolean running = true;
             try {
-                while (running) {
+                while (running && !socket.isClosed()) {
                     String input;
-                    input = scanner.nextLine();
+                    if (System.in.available() > 0) {
+                        input = scanner.nextLine();
+                    } else {
+                        Thread.sleep(250);
+                        continue;
+                    }
                     if (input == null) {
                         running = false;
                         break;
@@ -127,7 +132,6 @@ public class App {
 
                         case "quit":
                         case "exit":
-                            System.out.println("\u001B[35mClosing broker\u001B[0m");
                             running = false;
                             break;
 
@@ -136,7 +140,7 @@ public class App {
                             break;
                     }
                 }
-            } catch (IllegalStateException | NoSuchElementException e) {
+            } catch (IllegalStateException | NoSuchElementException | InterruptedException e) {
                 // Quit on System.in close
             }
             scanner.close();
