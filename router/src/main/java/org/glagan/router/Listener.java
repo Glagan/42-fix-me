@@ -8,10 +8,14 @@ import java.net.Socket;
 import org.glagan.core.Client;
 
 public abstract class Listener implements Runnable {
+    protected Servers servers;
     protected int port;
+    protected ServerSocket server;
 
-    public Listener(int port) {
+    public Listener(Servers servers, int port) {
+        this.servers = servers;
         this.port = port;
+        this.server = null;
     }
 
     public int getPort() {
@@ -21,7 +25,8 @@ public abstract class Listener implements Runnable {
     public abstract Client createClient(Socket socket);
 
     public void run() {
-        try (ServerSocket server = new ServerSocket(port)) {
+        try {
+            server = new ServerSocket(port);
             System.out.println("Listening on port " + port);
             while (true) {
                 Socket socket = server.accept();
@@ -32,8 +37,19 @@ public abstract class Listener implements Runnable {
         } catch (BindException e) {
             System.err.println("\u001B[31mFailed to bind to port\u001B[0m " + port);
         } catch (IOException e) {
-            System.err.println("\u001B[31mFailed to open socket server: \u001B[0m" + e.getMessage());
+            System.err.println("\u001B[31mFailed to accept client (port " + port + "): \u001B[0m" + e.getMessage());
+        } finally {
+            servers.closeAll();
         }
     }
 
+    public void close() {
+        if (server != null) {
+            try {
+                server.close();
+            } catch (IOException e) {
+                // Ignore excepted errors
+            }
+        }
+    }
 }
